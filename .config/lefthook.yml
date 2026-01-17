@@ -7,3 +7,7 @@ pre-commit:
     - name: go fmt
       run: go fmt ./...
       glob: "**/*.go"
+    - name: rumdl
+      run: rumdl fmt {staged_files}
+      glob: "**/*.md"
+      stage_fixed: true
