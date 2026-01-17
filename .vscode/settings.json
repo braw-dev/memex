@@ -2,11 +2,13 @@
 	"cSpell.words": [
 		"duckdb",
 		"evilmartians",
+		"koanf",
 		"lefthook",
 		"Memex",
 		"OLAP",
 		"ONNX",
 		"rumdl",
-		"speckit"
+		"speckit",
+		"stdlib"
 	]
 }
