@@ -5,6 +5,8 @@
 		"lefthook",
 		"Memex",
 		"OLAP",
-		"ONNX"
+		"ONNX",
+		"rumdl",
+		"speckit"
 	]
 }
