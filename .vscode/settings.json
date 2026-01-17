@@ -1,3 +1,10 @@
 {
-	"cSpell.words": ["duckdb", "Memex", "OLAP", "ONNX"]
+	"cSpell.words": [
+		"duckdb",
+		"evilmartians",
+		"lefthook",
+		"Memex",
+		"OLAP",
+		"ONNX"
+	]
 }
