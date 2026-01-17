@@ -1,0 +1,83 @@
+# MEMEX: The Infinite Context Engine
+
+Stop paying for the same code twice.
+
+---
+
+## **1. The Problem: The "Amnesia Tax"**
+
+Every time a developer uses an AI Agent (Claude Code, Cursor, Aider), they pay a tax—in both **Latency** and **Dollars**.
+
+* **The Amnesia:** Agents forget the solution they wrote for you last week. You have to pay (again) to regenerate it.
+* **The Latency:** Waiting 10 seconds for an answer you’ve already seen breaks the "Flow State."
+* **The Janitor Work:** Agents don't understand *your* environment. They suggest code that conflicts with your existing architecture because they lack persistent state.
+
+**The Current Solution (Anthropic Prompt Caching):** Caches the *input* so the model reads faster.
+**The Memex Solution:** Caches the *output* so the model doesn't have to work at all.
+
+## **2. The Solution: A "Universal Brain" for AI Coding**
+
+Memex is a **local-first, graph-aware proxy** that sits between your editor and the AI. It acts as a permanent L1 Cache for your engineering work.
+
+* **It lives on your laptop.** (Privacy first. Zero latency.)
+* **It understands code.** (Not just text.)
+* **It works with everything.** (Claude Code, Cursor, Aider, CLI).
+
+## **3. Strategic Architecture & Scope**
+
+We have made specific, opinionated technical decisions to ensure this tool is "Acquisition-Grade" from Day 1.
+
+### **A. The "Single Binary" Philosophy (Go)**
+
+* **Decision:** We chose **Go** with **Embedded Dependencies**.
+* **Reasoning:**
+* **Zero-Config:** Users shouldn't need Docker, Python, or a vector DB server.
+* **Offline-First:** The embedding model (`all-MiniLM-L6-v2`) is baked directly into the binary (`//go:embed`). It works on a plane.
+* **Performance:** Go's concurrency handles high-throughput proxy traffic better than Python.
+
+### **B. The "Graph-Aware" Cache (Tree-Sitter)**
+
+* **Decision:** We do not use standard "Semantic Caching" (which fails for code). We use **Syntax-Aware Hashing**.
+* **Reasoning:**
+* **Robustness:** Changing a comment (`// TODO`) or whitespace should not invalidate the cache.
+* **Scope:** Using **Tree-Sitter** allows us to hash the *Abstract Syntax Tree (AST)*. If the logic is the same, the cache hits—even if the formatting changed.
+
+### **C. The "Tri-Partite" Key Strategy**
+
+* **Decision:** We split the request into three distinct signals to maximize hits without false positives.
+
+1. **Code Context (Strict):** AST Hash. (Must match logic exactly).
+2. **System Prompt (Strict):** SHA-256. (Must match bot behavior exactly).
+3. **User Question (Fuzzy):** Vector Embedding. (Matches intent: *"Fix bug"* == *"Repair error"*).
+
+### **D. The Data Layer (DuckDB + BadgerDB)**
+
+* **Decision:** Embedded **DuckDB** for Logs/Analytics and **BadgerDB** for KV Cache.
+* **Reasoning:**
+* **No Servers:** Removes the need for a separate Postgres/ClickHouse container.
+* **"Shadow Billing":** DuckDB allows us to perform high-speed OLAP queries (e.g., "How much did this Repo cost me?") instantly on the client side.
+
+## **4. Enterprise Readiness (The "Trojan Horse")**
+
+To make this indispensable to CTOs (and thus valuable to Anthropic), we included features that solve "Corporate Anxiety."
+
+* **The "Panopticon" Audit Log:** Every line of code generated is logged to a local `.duckdb` file. This creates an immutable "Flight Recorder" for compliance without sending data to a third party.
+* **PII Air Gap:** A local regex/heuristic middleware that blocks requests containing AWS Keys or Secrets *before* they leave the laptop.
+* **Cost Attribution:** We salt every hash with the **Git Remote URL**. This allows finance teams to see AI spend broken down *by project* or *by team*.
+
+## **5. User Experience (UX)**
+
+* **"Magic" Init:** Auto-detects the Git Repo and "Salts" the cache automatically.
+* **Dual-Channel Busting:**
+* **Click:** Injected Markdown links (`[Force Regenerate]`) for UI users (Cursor).
+* **Type:** `!reset` command for Terminal users (Aider).
+
+* **Universal Protocol:** Natively supports both Anthropic (`/v1/messages`) and OpenAI (`/v1/chat/completions`) schemas, making it the "Switzerland" of AI tooling.
+
+## **6. Why Anthropic? (The Acquisition Thesis)**
+
+We are building the infrastructure Anthropic is missing.
+
+1. **Retention:** By solving the "Rate Limit" and "Cost" complaints locally, we stop users from churning to cheaper/faster models.
+2. **Lock-in:** Once a company’s entire engineering history is cached in Memex, switching to OpenAI means losing that memory. We create **Data Gravity**.
+3. **Alignment:** Our focus on "Safety" (PII blocking) and "Reliability" (Audit logs) aligns perfectly with Anthropic's "Constitutional AI" brand.
