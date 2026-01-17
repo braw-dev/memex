@@ -1,50 +1,193 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+==================
+Version Change: 0.0.0 → 1.0.0 (MAJOR - Initial constitution ratification)
+
+Modified Principles: N/A (new constitution)
+
+Added Sections:
+  - Core Principles (6 principles)
+  - Technical Invariants
+  - Architectural Patterns
+  - User Experience Laws
+  - Directory Structure
+  - Strategic Alignment
+  - Governance
+
+Removed Sections: N/A (new constitution)
+
+Templates Requiring Updates:
+  - .specify/templates/plan-template.md ✅ Compatible (Constitution Check section exists)
+  - .specify/templates/spec-template.md ✅ Compatible (technology-agnostic)
+  - .specify/templates/tasks-template.md ✅ Compatible (phase structure aligns)
+
+Follow-up TODOs: None
+==================
+-->
+
+# Memex Constitution
+
+## Mission Directive
+
+Build "Memex": A single-binary, local-first "Universal Brain" for AI coding tools.
+
+**Goal**: Create an indispensable infrastructure layer for Enterprise AI adoption.
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Single Binary Distribution
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+All functionality MUST be delivered as a single static binary with no external runtime dependencies.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+- **No Docker** containers required for deployment
+- **No Python** or other interpreter dependencies
+- **No model downloads** at runtime - all assets embedded via `//go:embed`
+- Users MUST be able to run `memex init` and have a working system immediately
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale**: Enterprise adoption requires minimal operational overhead. A single binary eliminates dependency management, version conflicts, and deployment complexity.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. Go-Only Implementation
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+The entire codebase MUST be written in Go (Golang) 1.25.6+.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- All components, libraries, and tools MUST use Go
+- Third-party dependencies MUST have Go bindings (no CGO shelling out to external processes)
+- Build process MUST produce a statically-linked binary
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**Rationale**: Go's compilation model, cross-platform support, and static linking capabilities directly enable the Single Binary Distribution principle.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### III. Embedded Storage Architecture
+
+All persistent storage MUST use embedded databases with no external services.
+
+- **OLAP/Logs**: Embedded DuckDB via `go-duckdb` for analytical queries and audit logging
+- **KV/Cache**: Embedded BadgerDB v4 for key-value storage and cache operations
+- No external database servers (PostgreSQL, Redis, etc.) permitted
+
+**Rationale**: External databases create operational dependencies that violate the single-binary principle and complicate enterprise deployment.
+
+### IV. Tri-Partite Cache Key System
+
+Every cache lookup MUST use three distinct signals to prevent collisions and ensure semantic accuracy:
+
+1. **Context Hash (Strict)**: Tree-Sitter AST hash of input files (ignores whitespace/comments)
+2. **System Hash (Strict)**: SHA-256 of the System Prompt
+3. **Intent Vector (Fuzzy)**: Cosine similarity (>0.97 threshold, configurable) of User Prompt using embedded ONNX model (`all-MiniLM-L6-v2`)
+
+**Rationale**: Single-dimension caching leads to false positives. The tri-partite approach ensures cache hits only occur when context, system instructions, AND user intent all match.
+
+### V. Middleware Chain Order
+
+The HTTP Proxy MUST process requests in this exact sequence:
+
+1. **Auth/Scope**: Detect Git Repo URL to salt the cache key
+2. **Magic Command**: Intercept `!reset` or `!bust` to clear cache
+3. **PII Scrubber**: Block requests containing AWS/Stripe keys (Regex-based, extendable)
+4. **Cache Lookaside**: Check BadgerDB using Tri-Partite Key
+5. **Audit Logger**: Async write to DuckDB (Shadow Billing)
+
+**Rationale**: Order matters for security and correctness. PII blocking MUST occur before any caching or logging to prevent sensitive data persistence.
+
+### VI. Protocol Compatibility
+
+The proxy MUST support both major AI provider schemas transparently:
+
+- **Anthropic**: `/v1/messages` endpoint schema
+- **OpenAI**: `/v1/chat/completions` endpoint schema
+
+Clients MUST NOT need to modify their existing integrations to use Memex.
+
+**Rationale**: Enterprise adoption requires drop-in compatibility with existing tooling. Supporting both schemas maximizes addressable market.
+
+## Technical Invariants
+
+These constraints are NON-NEGOTIABLE and MUST NOT be violated under any circumstances:
+
+| Invariant | Requirement |
+|-----------|-------------|
+| Language | Go 1.25.6+ |
+| Distribution | Single static binary |
+| OLAP Storage | Embedded DuckDB (`go-duckdb`) |
+| KV Storage | Embedded BadgerDB v4 |
+| Embeddings | `all-MiniLM-L6-v2` (ONNX) via `//go:embed` |
+| Parsing | Tree-Sitter (Go bindings) |
+| Protocol | HTTP Proxy (Anthropic + OpenAI schemas) |
+
+## User Experience Laws
+
+### Zero Configuration
+
+- The binary MUST work immediately after `memex init`
+- No model downloads, no config file editing, no environment setup required
+- Sensible defaults MUST cover 90% of use cases
+
+### Cache Transparency
+
+- Cache hits MUST inject a Markdown footer: `> ⚡ Cached. [Force Regenerate](link)`
+- Users MUST always know when they're receiving cached responses
+- The "bust" mechanism MUST be discoverable and easy to use
+
+### Cost Visibility
+
+- CLI output MUST show "Money Saved" per session
+- Users MUST have visibility into cache hit rates and estimated savings
+- Transparency builds trust and demonstrates value
+
+## Directory Structure
+
+```plaintext
+/memex-ai-caching-memory
+  ├── cmd/proxy          # Main entrypoint
+  ├── internal/
+  │   ├── brain/         # Tree-Sitter & ONNX logic
+  │   ├── proxy/         # HTTP Handlers & Middleware
+  │   └── store/         # DuckDB & BadgerDB wrappers
+  ├── pkg/types/         # Shared Structs
+  └── assets/            # Embedded Model Weights
+```
+
+All new code MUST follow this structure. Deviations require explicit justification and constitution amendment.
+
+## Strategic Alignment
+
+### Reliability First
+
+- Prioritize exact matches over fuzzy matches to prevent code hallucination
+- When in doubt, cache miss is safer than false positive
+- Fuzzy matching threshold (0.97) MUST be conservative
+
+### Performance Requirements
+
+- Proxy overhead MUST be <10ms for cache lookups
+- Cache operations MUST NOT block request processing beyond this threshold
+- Async logging MUST NOT impact response latency
+
+### Safety as P0
+
+- PII blocking is a P0 (highest priority) feature
+- AWS keys, Stripe keys, and other secrets MUST be detected and blocked
+- Regex patterns MUST be extendable for organization-specific requirements
+- No sensitive data MUST ever be persisted to cache or logs
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### Amendment Process
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+1. Proposed changes MUST be documented with rationale
+2. Changes to Technical Invariants require MAJOR version bump
+3. All amendments MUST update the `LAST_AMENDED_DATE`
+4. Breaking changes MUST include migration guidance
+
+### Compliance Verification
+
+- All PRs MUST verify compliance with this constitution
+- Constitution Check in plan templates MUST pass before implementation
+- Violations MUST be justified in Complexity Tracking section
+
+### Version Policy
+
+- **MAJOR**: Backward-incompatible changes to principles or invariants
+- **MINOR**: New principles, sections, or materially expanded guidance
+- **PATCH**: Clarifications, wording improvements, typo fixes
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-17 | **Last Amended**: 2026-01-17
