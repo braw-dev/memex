@@ -58,13 +58,13 @@ The entire codebase MUST be written in Go (Golang) 1.25.6+.
 
 ### III. Embedded Storage Architecture
 
-All persistent storage MUST use embedded databases with no external services.
+All persistent storage MUST use embedded DuckDB for all storage needs (OLAP, KV, and Cache).
 
-- **OLAP/Logs**: Embedded DuckDB via `go-duckdb` for analytical queries and audit logging
-- **KV/Cache**: Embedded BadgerDB v4 for key-value storage and cache operations
-- No external database servers (PostgreSQL, Redis, etc.) permitted
+- **Unified Storage**: Embedded DuckDB via `go-duckdb` for analytical queries, audit logging, and key-value cache operations.
+- **No BadgerDB**: BadgerDB is deprecated and MUST NOT be used.
+- **No external database servers** (PostgreSQL, Redis, etc.) permitted.
 
-**Rationale**: External databases create operational dependencies that violate the single-binary principle and complicate enterprise deployment.
+**Rationale**: Consolidating on DuckDB reduces codebase complexity, simplifies the single-binary distribution, and provides superior analytical capabilities for audit logs while still supporting efficient key-value lookups via primary keys.
 
 ### IV. Tri-Partite Cache Key System
 
@@ -83,8 +83,8 @@ The HTTP Proxy MUST process requests in this exact sequence:
 1. **Auth/Scope**: Detect Git Repo URL to salt the cache key
 2. **Magic Command**: Intercept `!reset` or `!bust` to clear cache
 3. **PII Scrubber**: Block requests containing AWS/Stripe keys (Regex-based, extendable)
-4. **Cache Lookaside**: Check BadgerDB using Tri-Partite Key
-5. **Audit Logger**: Async write to DuckDB (Shadow Billing)
+4. **Cache Lookaside**: Check DuckDB `cache_entries` using Tri-Partite Key
+5. **Audit Logger**: Async write to DuckDB `audit_logs` (Shadow Billing)
 
 **Rationale**: Order matters for security and correctness. PII blocking MUST occur before any caching or logging to prevent sensitive data persistence.
 
@@ -108,7 +108,7 @@ These constraints are NON-NEGOTIABLE and MUST NOT be violated under any circumst
 | Language | Go 1.25.6+ |
 | Distribution | Single static binary |
 | OLAP Storage | Embedded DuckDB (`go-duckdb`) |
-| KV Storage | Embedded BadgerDB v4 |
+| KV Storage | Embedded DuckDB (`go-duckdb`) |
 | Embeddings | `all-MiniLM-L6-v2` (ONNX) via `//go:embed` |
 | Parsing | Tree-Sitter (Go bindings) |
 | Protocol | HTTP Proxy (Anthropic + OpenAI schemas) |
@@ -142,7 +142,7 @@ These constraints are NON-NEGOTIABLE and MUST NOT be violated under any circumst
   ├── internal/
   │   ├── brain/         # Tree-Sitter & ONNX logic
   │   ├── proxy/         # HTTP Handlers & Middleware
-  │   └── store/         # DuckDB & BadgerDB wrappers
+  │   └── store/         # DuckDB wrappers
   ├── pkg/types/         # Shared Structs
   └── assets/            # Embedded Model Weights
 ```

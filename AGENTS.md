@@ -10,7 +10,7 @@ Key constraints to verify before any implementation:
 
 1. **Single Binary**: No external dependencies, Docker, or runtime downloads
 2. **Go Only**: All code in Go 1.25.6+, no other languages
-3. **Embedded Storage**: DuckDB for OLAP, BadgerDB for KV - no external databases
+3. **Embedded Storage**: DuckDB for all storage needs (OLAP, KV, Cache) - no external databases
 4. **Performance**: Proxy overhead <10ms
 5. **Safety**: PII blocking is P0 - never persist sensitive data
 
@@ -20,7 +20,7 @@ Key constraints to verify before any implementation:
 cmd/proxy/          → Main entrypoint only
 internal/brain/     → Tree-Sitter parsing, ONNX embeddings
 internal/proxy/     → HTTP handlers, middleware chain
-internal/store/     → DuckDB and BadgerDB wrappers
+internal/store/     → DuckDB wrappers
 pkg/types/          → Shared structs and interfaces
 assets/             → Embedded model weights (go:embed)
 ```
@@ -31,6 +31,7 @@ assets/             → Embedded model weights (go:embed)
 2. Follow the middleware chain order (Auth → Magic → PII → Cache → Audit)
 3. Use tri-partite cache keys (Context + System + Intent)
 4. Test with both Anthropic and OpenAI schemas
+5. Store all data in `.memex/brain.duckdb` using `sqlx`
 
 ## Specification System
 

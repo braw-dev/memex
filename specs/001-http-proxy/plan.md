@@ -18,7 +18,7 @@ Build a high-performance HTTP reverse proxy in Go that intercepts traffic betwee
 - `knadh/koanf/v2` (already in go.mod) for configuration file reading (YAML/TOML)
 - Minimal external dependencies - prefer stdlib where possible
 
-**Storage**: N/A for this feature (passthrough only; future features will use BadgerDB/DuckDB)  
+**Storage**: N/A for this feature (passthrough only; future features will use DuckDB)  
 **Testing**: Standard Go testing (`testing` package) with `net/http/httptest` for HTTP handlers  
 **Target Platform**: Cross-platform (Linux, macOS, Windows) - single static binary  
 **Project Type**: Single binary CLI/service  
@@ -60,7 +60,7 @@ Build a high-performance HTTP reverse proxy in Go that intercepts traffic betwee
 ### ✅ Embedded Storage Architecture
 
 - **Status**: N/A (not applicable for passthrough-only feature)
-- **Rationale**: This feature does not use storage. Future caching features will use BadgerDB/DuckDB per constitution.
+- **Rationale**: This feature does not use storage. Future caching features will use DuckDB per constitution.
 
 ### ✅ Protocol Compatibility
 

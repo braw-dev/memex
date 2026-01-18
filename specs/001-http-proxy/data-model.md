@@ -131,7 +131,7 @@ ProxyConfig
 
 ## Notes
 
-- **No Persistent Storage**: This feature is passthrough-only. No data is persisted. Future caching features will introduce storage entities (BadgerDB keys, DuckDB records).
+- **No Persistent Storage**: This feature is passthrough-only. No data is persisted. Future caching features will introduce storage entities (DuckDB records).
 
 - **Request Context**: `SchemaType` is stored in `request.Context()` using `context.WithValue()` to pass metadata through proxy chain without modifying request headers.
 
