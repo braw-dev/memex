@@ -5,6 +5,13 @@ go 1.25.6
 tool github.com/evilmartians/lefthook/v2
 
 require (
+	github.com/knadh/koanf/parsers/toml/v2 v2.2.0
+	github.com/knadh/koanf/parsers/yaml v1.1.0
+	github.com/knadh/koanf/providers/fs v1.0.0
+	github.com/knadh/koanf/v2 v2.3.0
+)
+
+require (
 	github.com/alessio/shellescape v1.4.1 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.9.1 // indirect
@@ -29,11 +36,7 @@ require (
 	github.com/kaptinlin/messageformat-go v0.4.7 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/parsers/json v1.0.0 // indirect
-	github.com/knadh/koanf/parsers/toml/v2 v2.2.0 // indirect
-	github.com/knadh/koanf/parsers/yaml v1.1.0 // indirect
-	github.com/knadh/koanf/providers/fs v1.0.0 // indirect
 	github.com/knadh/koanf/providers/rawbytes v1.0.0 // indirect
-	github.com/knadh/koanf/v2 v2.3.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
