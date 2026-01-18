@@ -24,7 +24,7 @@ func TestHTTPPassthrough(t *testing.T) {
 		if r.Header.Get("Proxy-Authorization") != "" {
 			t.Errorf("Expected Proxy-Authorization to be removed")
 		}
-		
+
 		w.Header().Set("X-Response", "ok")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("hello world"))
@@ -39,7 +39,7 @@ func TestHTTPPassthrough(t *testing.T) {
 		FlushInterval:   0,
 		Debug:           true,
 	}
-	
+
 	handler := proxy.NewServer(config)
 	proxyServer := httptest.NewServer(handler)
 	defer proxyServer.Close()
@@ -100,36 +100,36 @@ func TestHealthz(t *testing.T) {
 }
 
 func TestProxyHeaders(t *testing.T) {
-    // Test that Proxy-Authorization header is stripped
-    upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        if r.Header.Get("Proxy-Authorization") != "" {
-            t.Errorf("Proxy-Authorization header was not stripped")
-        }
-        w.WriteHeader(http.StatusOK)
-    }))
-    defer upstream.Close()
+	// Test that Proxy-Authorization header is stripped
+	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Proxy-Authorization") != "" {
+			t.Errorf("Proxy-Authorization header was not stripped")
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer upstream.Close()
 
-    config := &proxy.ProxyConfig{
-        ListenAddr: ":0",
-        Debug:      true,
-    }
-    handler := proxy.NewServer(config)
-    proxyServer := httptest.NewServer(handler)
-    defer proxyServer.Close()
+	config := &proxy.ProxyConfig{
+		ListenAddr: ":0",
+		Debug:      true,
+	}
+	handler := proxy.NewServer(config)
+	proxyServer := httptest.NewServer(handler)
+	defer proxyServer.Close()
 
-    proxyURL, _ := url.Parse(proxyServer.URL)
-    client := &http.Client{
-        Transport: &http.Transport{
-            Proxy: http.ProxyURL(proxyURL),
-        },
-    }
+	proxyURL, _ := url.Parse(proxyServer.URL)
+	client := &http.Client{
+		Transport: &http.Transport{
+			Proxy: http.ProxyURL(proxyURL),
+		},
+	}
 
-    req, _ := http.NewRequest("GET", upstream.URL, nil)
-    req.Header.Set("Proxy-Authorization", "Basic user:pass") // Manually set header to test stripping
-    
-    resp, err := client.Do(req)
-    if err != nil {
-        t.Fatalf("Request failed: %v", err)
-    }
-    resp.Body.Close()
+	req, _ := http.NewRequest("GET", upstream.URL, nil)
+	req.Header.Set("Proxy-Authorization", "Basic user:pass") // Manually set header to test stripping
+
+	resp, err := client.Do(req)
+	if err != nil {
+		t.Fatalf("Request failed: %v", err)
+	}
+	resp.Body.Close()
 }
