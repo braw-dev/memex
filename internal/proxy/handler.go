@@ -68,6 +68,9 @@ func NewServer(config *ProxyConfig) http.Handler {
 		h = debugMiddleware(h, config)
 	}
 
+	// ScopeMiddleware (Principle V: Auth/Scope is first)
+	h = ScopeMiddleware(h, config)
+
 	return h
 }
 
