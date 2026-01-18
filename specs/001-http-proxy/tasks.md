@@ -21,9 +21,9 @@ description: "Task list for HTTP Reverse Proxy implementation"
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create project directories (`cmd/proxy`, `internal/proxy`, `pkg/types`, `tests/integration`, `tests/unit`)
-- [ ] T002 [P] Verify `go.mod` dependencies (ensure `knadh/koanf/v2` is available)
-- [ ] T003 Create `main.go` entrypoint skeleton in `cmd/proxy/main.go`
+- [x] T001 Create project directories (`cmd/proxy`, `internal/proxy`, `pkg/types`, `tests/integration`, `tests/unit`)
+- [x] T002 [P] Verify `go.mod` dependencies (ensure `knadh/koanf/v2` is available)
+- [x] T003 Create `main.go` entrypoint skeleton in `cmd/proxy/main.go`
 
 ---
 
@@ -33,11 +33,11 @@ description: "Task list for HTTP Reverse Proxy implementation"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Create `ProxyConfig` struct and `ConfigLoader` interface in `internal/proxy/config.go`
-- [ ] T005 Implement configuration loading using `koanf` in `internal/proxy/config.go`
-- [ ] T006 [P] Define `ProxyRequest`, `ProxyResponse`, and `SchemaType` types in `pkg/types/proxy.go`
-- [ ] T007 Create basic `ProxyHandler` structure and `NewProxyHandler` factory in `internal/proxy/handler.go`
-- [ ] T008 Integrate config loading into `cmd/proxy/main.go` to initialize server
+- [x] T004 Create `ProxyConfig` struct and `ConfigLoader` interface in `internal/proxy/config.go`
+- [x] T005 Implement configuration loading using `koanf` in `internal/proxy/config.go`
+- [x] T006 [P] Define `ProxyRequest`, `ProxyResponse`, and `SchemaType` types in `pkg/types/proxy.go`
+- [x] T007 Create basic `ProxyHandler` structure and `NewProxyHandler` factory in `internal/proxy/handler.go`
+- [x] T008 Integrate config loading into `cmd/proxy/main.go` to initialize server
 
 **Checkpoint**: Foundation ready - basic server structure exists and can load config.
 
@@ -51,11 +51,11 @@ description: "Task list for HTTP Reverse Proxy implementation"
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Implement `ServeHTTP` using `httputil.ReverseProxy` in `internal/proxy/handler.go`
-- [ ] T010 [US1] Implement `HandleCONNECT` for HTTPS tunneling in `internal/proxy/handler.go`
-- [ ] T011 [US1] Configure `ReverseProxy` Director to handle standard headers and upstream URL parsing in `internal/proxy/handler.go`
-- [ ] T012 [US1] Create integration test for HTTP passthrough in `tests/integration/proxy_test.go`
-- [ ] T013 [US1] Create integration test for HTTPS CONNECT tunneling in `tests/integration/proxy_test.go`
+- [x] T009 [US1] Implement `ServeHTTP` using `httputil.ReverseProxy` in `internal/proxy/handler.go`
+- [x] T010 [US1] Implement `HandleCONNECT` for HTTPS tunneling in `internal/proxy/handler.go`
+- [x] T011 [US1] Configure `ReverseProxy` Director to handle standard headers and upstream URL parsing in `internal/proxy/handler.go`
+- [x] T012 [US1] Create integration test for HTTP passthrough in `tests/integration/proxy_test.go`
+- [x] T013 [US1] Create integration test for HTTPS CONNECT tunneling in `tests/integration/proxy_test.go`
 
 **Checkpoint**: At this point, the proxy acts as a standard transparent proxy.
 
@@ -69,10 +69,10 @@ description: "Task list for HTTP Reverse Proxy implementation"
 
 ### Implementation for User Stories 2 & 3
 
-- [ ] T014 [US2] [US3] Implement `SchemaDetector` logic (URL path matching) in `internal/proxy/schema.go`
-- [ ] T015 [US2] [US3] Update `ServeHTTP` to use `SchemaDetector` and store `SchemaType` in request context in `internal/proxy/handler.go`
-- [ ] T016 [P] [US2] [US3] Add debug logging to print detected schema in `internal/proxy/handler.go` (guarded by config.Debug)
-- [ ] T017 [P] [US2] [US3] Create unit tests for `SchemaDetector` in `tests/unit/schema_test.go`
+- [x] T014 [US2] [US3] Implement `SchemaDetector` logic (URL path matching) in `internal/proxy/schema.go`
+- [x] T015 [US2] [US3] Update `ServeHTTP` to use `SchemaDetector` and store `SchemaType` in request context in `internal/proxy/handler.go`
+- [x] T016 [P] [US2] [US3] Add debug logging to print detected schema in `internal/proxy/handler.go` (guarded by config.Debug)
+- [x] T017 [P] [US2] [US3] Create unit tests for `SchemaDetector` in `tests/unit/schema_test.go`
 
 **Checkpoint**: Proxy now correctly identifies and logs AI traffic types.
 
@@ -86,9 +86,9 @@ description: "Task list for HTTP Reverse Proxy implementation"
 
 ### Implementation for User Story 4
 
-- [ ] T018 [US4] Verify and ensure `Proxy-Authorization` header handling in `internal/proxy/handler.go`
-- [ ] T019 [US4] Add documentation on using `HTTP_PROXY`/`HTTPS_PROXY` env vars to `README.md` or `quickstart.md`
-- [ ] T020 [P] [US4] Add integration test case verifying proxy works when client uses standard proxy headers in `tests/integration/proxy_test.go`
+- [x] T018 [US4] Verify and ensure `Proxy-Authorization` header handling in `internal/proxy/handler.go`
+- [x] T019 [US4] Add documentation on using `HTTP_PROXY`/`HTTPS_PROXY` env vars to `README.md` or `quickstart.md`
+- [x] T020 [P] [US4] Add integration test case verifying proxy works when client uses standard proxy headers in `tests/integration/proxy_test.go`
 
 **Checkpoint**: Proxy is fully compliant with standard client configuration methods.
 
@@ -98,10 +98,10 @@ description: "Task list for HTTP Reverse Proxy implementation"
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T021 [P] Implement graceful shutdown handling in `cmd/proxy/main.go`
-- [ ] T022 Ensure error handling (502/504) returns JSON responses where appropriate in `internal/proxy/errors.go`
-- [ ] T023 Run performance benchmark to verify <5ms overhead (simple latency check script)
-- [ ] T024 Validate `quickstart.md` instructions against implementation
+- [x] T021 [P] Implement graceful shutdown handling in `cmd/proxy/main.go`
+- [x] T022 Ensure error handling (502/504) returns JSON responses where appropriate in `internal/proxy/errors.go`
+- [x] T023 Run performance benchmark to verify <5ms overhead (simple latency check script)
+- [x] T024 Validate `quickstart.md` instructions against implementation
 
 ---
 
