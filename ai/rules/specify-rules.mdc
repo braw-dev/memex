@@ -1,0 +1,29 @@
+# memex-ai-caching-memory Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-01-17
+
+## Active Technologies
+
+- Go 1.25.6+ (per constitution) (001-http-proxy)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+## Add commands for Go 1.25.6+ (per constitution)
+
+## Code Style
+
+Go 1.25.6+ (per constitution): Follow standard conventions
+
+## Recent Changes
+
+- 001-http-proxy: Added Go 1.25.6+ (per constitution)
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->

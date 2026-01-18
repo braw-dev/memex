@@ -4,6 +4,12 @@ pre-commit:
     - name: go-mod-tidy
       run: go mod tidy
       glob: "go.mod"
+      stage_fixed: true
     - name: go fmt
       run: go fmt ./...
       glob: "**/*.go"
+      stage_fixed: true
+    - name: rumdl
+      run: rumdl fmt {staged_files}
+      glob: "**/*.md"
+      stage_fixed: true

@@ -1,0 +1,163 @@
+---
+description: Guidelines for writing maintainable, testable HTTP services in Go based on Mat Ryer's principles.
+globs: **/*.go
+---
+
+# Go HTTP Service Guidelines
+
+Follow these principles when writing HTTP services in Go to ensure maintainability, testability, and clarity. These rules are based on "How I write HTTP services in Go after 13 years" by Mat Ryer.
+
+## Core Structure
+
+### 1. `NewServer` Constructor
+
+* Create a `NewServer` function that accepts **all dependencies** as arguments (e.g., loggers, config, database stores).
+* It should return an `http.Handler` (usually an `http.ServeMux`), not a custom struct.
+* Do not use global state.
+* Configure middleware, CORS, and routing inside this function.
+
+```go
+func NewServer(
+    logger *Logger,
+    config *Config,
+    dataStore *DataStore,
+) http.Handler {
+    mux := http.NewServeMux()
+    addRoutes(mux, logger, config, dataStore)
+    var handler http.Handler = mux
+    handler = someMiddleware(handler)
+    return handler
+}
+
+```
+
+### 2. Centralized `routes.go`
+
+* Define a single function (e.g., `addRoutes`) in `routes.go` to map the entire API surface.
+* Pass dependencies from `NewServer` into `addRoutes`.
+* This file acts as the "table of contents" for your API.
+
+```go
+func addRoutes(
+    mux *http.ServeMux,
+    logger *Logger,
+    store *DataStore,
+) {
+    mux.Handle("GET /api/v1/users", handleUsersGet(logger, store))
+    mux.Handle("POST /api/v1/users", handleUsersCreate(logger, store))
+}
+
+```
+
+## Handlers
+
+### 3. "Maker Funcs" for Handlers
+
+* Do not hang handlers off a struct (e.g., `func (s *Server) handle...`).
+* Instead, use functions that **return** `http.Handler` (or `http.HandlerFunc`).
+* Pass handler-specific dependencies as arguments to the maker function.
+* This creates a closure for the handler environment.
+
+```go
+func handleUsersGet(logger *Logger, store *DataStore) http.Handler {
+    // One-time initialization (if needed)
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Request handling logic
+        data, err := store.ListUsers()
+        if err != nil {
+            // handle error
+        }
+        encode(w, r, http.StatusOK, data)
+    })
+}
+
+```
+
+## Main & Execution
+
+### 4. `run` Function Pattern
+
+* `func main()` should be minimal and only call a `run()` function.
+* `run` should accept OS fundamentals (`context`, `stdin`, `stdout`, `args`, `getenv`) to make the program easily testable.
+* `run` returns `error`. `main` handles the exit code.
+
+```go
+func run(
+    ctx context.Context,
+    w io.Writer,
+    args []string,
+    getenv func(string) string,
+) error {
+    // Setup dependencies, parse flags, start server
+    // Handle graceful shutdown via ctx
+    return nil
+}
+
+func main() {
+    ctx := context.Background()
+    if err := run(ctx, os.Stdout, os.Args, os.Getenv); err != nil {
+        fmt.Fprintf(os.Stderr, "%s\n", err)
+        os.Exit(1)
+    }
+}
+
+```
+
+## Data Handling
+
+### 5. Generic Encode/Decode
+
+* Use generic helper functions for JSON encoding and decoding to standardize behavior.
+* Define them once and reuse them across handlers.
+
+```go
+func encode[T any](w http.ResponseWriter, r *http.Request, status int, v T) error {
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(status)
+    if err := json.NewEncoder(w).Encode(v); err != nil {
+        return fmt.Errorf("encode json: %w", err)
+    }
+    return nil
+}
+
+func decode[T any](r *http.Request) (T, error) {
+    var v T
+    if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
+        return v, fmt.Errorf("decode json: %w", err)
+    }
+    return v, nil
+}
+
+```
+
+### 6. Validation Interface
+
+* Use a simple interface for validation.
+* Return a map of field names to error messages.
+
+```go
+type Validator interface {
+    // Valid checks the object and returns any problems.
+    // len(problems) == 0 implies validity.
+    Valid(ctx context.Context) (problems map[string]string)
+}
+
+```
+
+## Testing
+
+### 7. Test via `run` or `NewServer`
+
+* Because `run` accepts `io.Writer` and `args`, you can test the CLI behavior end-to-end.
+* Because `NewServer` returns `http.Handler`, you can test API endpoints using `httptest.NewServer` or by passing the handler directly to `httptest.ResponseRecorder`.
+* Avoid global state to allow `t.Parallel()` in tests.
+
+### 8. Wait for Readiness
+
+* Implement a health check (`/healthz`).
+* In integration tests, use a loop to wait for the server to be ready before firing requests.
+
+## Request/Response Types
+
+* Define Request/Response structs specifically for the handler if they are unique.
+* You can define them inside the "maker func" or adjacent to it for better locality ("storytelling").
