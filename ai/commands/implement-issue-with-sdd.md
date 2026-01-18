@@ -82,8 +82,7 @@ Take a GitHub issue number and optional context, validate the issue content, and
 **Commit**:
 
 * **SAFETY CHECK**: Verify current branch is **NOT** `main` or `master`.
-* Run `git add .`
-* Run `git commit -m "docs: add technical plan and research"`
+* Add and commit the files with a helpful semantic commit message
 
 #### Phase 3: Task Generation (`/speckit.tasks`)
 
@@ -93,8 +92,7 @@ Take a GitHub issue number and optional context, validate the issue content, and
 **Commit**:
 
 * **SAFETY CHECK**: Verify current branch is **NOT** `main` or `master`.
-* Run `git add .`
-* Run `git commit -m "docs: generate implementation tasks"`
+* Add and commit the files with a helpful semantic commit message
 
 #### Phase 4: Analysis (`/speckit.analyze`)
 
@@ -110,7 +108,16 @@ Take a GitHub issue number and optional context, validate the issue content, and
 **Action**: Run `/speckit.implement`.
 **Observation**: This executes the tasks in `tasks.md`.
 **Completion**: Wait for all tasks to finish.
-**DO NOT COMMIT**: Wait for user approval
+**Commit**:
+
+* **SAFETY CHECK**: Verify current branch is **NOT** `main` or `master`.
+* Add and commit the files with a helpful semantic commit message
+
+#### Phase 6: Review (`/open-pr`)
+
+**Action**: Run `/open-pr`.
+**Observation**: This creates a new Pull Request for manual review on GitHub
+**Completion**: Wait for opening of PR to complete and prominently show the link to the DRAFT PR for review.
 
 1. **Final Report**:
    * Summarize the work done.
