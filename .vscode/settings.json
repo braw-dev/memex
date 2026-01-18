@@ -19,5 +19,6 @@
 		"Ryer",
 		"speckit",
 		"stdlib"
-	]
+	],
+	"git.showCursorWorktrees": true
 }
