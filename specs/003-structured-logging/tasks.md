@@ -17,8 +17,8 @@ We will implement this feature in priority order (P0 -> P1).
 
 *Goal: Initialize configuration structures.*
 
-- [ ] T001 Update `ProxyConfig` and add `LogConfig` struct in `internal/proxy/config.go`
-- [ ] T002 Update `DefaultConfigLoader` to load logging configuration in `internal/proxy/config.go`
+- [x] T001 Update `ProxyConfig` and add `LogConfig` struct in `internal/proxy/config.go`
+- [x] T002 Update `DefaultConfigLoader` to load logging configuration in `internal/proxy/config.go`
 
 ## Phase 2: Foundational
 
@@ -31,32 +31,32 @@ We will implement this feature in priority order (P0 -> P1).
 *Goal: Ensure sensitive data is masked.*
 *Independent Test: Unit tests for LogValuer implementations.*
 
-- [ ] T003 [US3] Create `pkg/types/sensitive.go` with `LogValuer` implementations for sensitive strings
-- [ ] T004 [US3] Add unit tests for PII masking in `pkg/types/sensitive_test.go`
+- [x] T003 [US3] Create `pkg/types/sensitive.go` with `LogValuer` implementations for sensitive strings
+- [x] T004 [US3] Add unit tests for PII masking in `pkg/types/sensitive_test.go`
 
 ## Phase 4: User Story 1 - Configure Logging (P1)
 
 *Goal: Control logging behavior via configuration.*
 *Independent Test: Verify application starts with different log levels and formats.*
 
-- [ ] T005 [US1] Add unit tests for `LogConfig` parsing in `internal/proxy/config_test.go`
-- [ ] T006 [US1] Initialize global `slog.Logger` in `cmd/proxy/main.go` based on configuration
+- [x] T005 [US1] Add unit tests for `LogConfig` parsing in `internal/proxy/config_test.go`
+- [x] T006 [US1] Initialize global `slog.Logger` in `cmd/proxy/main.go` based on configuration
 
 ## Phase 5: User Story 2 - Structured Output (P1)
 
 *Goal: Replace unstructured printing with structured logs.*
 *Independent Test: Run proxy and verify JSON/Text output format.*
 
-- [ ] T007 [P] [US2] Replace `fmt.Printf` and `log.Print` with `slog` in `internal/proxy/handler.go`
-- [ ] T008 [P] [US2] Replace `fmt.Printf` and `log.Print` with `slog` in `internal/proxy/middleware.go`
-- [ ] T009 [US2] Remove `Debug` field from `ProxyConfig` and cleanup usages in `internal/proxy/config.go`
+- [x] T007 [P] [US2] Replace `fmt.Printf` and `log.Print` with `slog` in `internal/proxy/handler.go`
+- [x] T008 [P] [US2] Replace `fmt.Printf` and `log.Print` with `slog` in `internal/proxy/middleware.go`
+- [x] T009 [US2] Remove `Debug` field from `ProxyConfig` and cleanup usages in `internal/proxy/config.go`
 
 ## Final Phase: Polish & Verification
 
 *Goal: Final consistency checks.*
 
-- [ ] T010 Verify no `fmt.Printf` calls remain in the proxy path (Manual Grep)
-- [ ] T011 Verify PII is masked in actual logs during a request (Manual Test)
+- [x] T010 Verify no `fmt.Printf` calls remain in the proxy path (Manual Grep)
+- [x] T011 Verify PII is masked in actual logs during a request (Manual Test)
 
 ## Dependencies
 
