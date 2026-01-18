@@ -8,6 +8,7 @@ require (
 	github.com/go-git/go-git/v5 v5.16.4
 	github.com/knadh/koanf/parsers/toml/v2 v2.2.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0
+	github.com/knadh/koanf/providers/env v1.1.0
 	github.com/knadh/koanf/providers/fs v1.0.0
 	github.com/knadh/koanf/v2 v2.3.0
 )
