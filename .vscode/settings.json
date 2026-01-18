@@ -1,7 +1,13 @@
 {
 	"cSpell.words": [
 		"duckdb",
+		"Errorf",
 		"evilmartians",
+		"Fprintf",
+		"Funcs",
+		"Getenv",
+		"healthz",
+		"httptest",
 		"httputil",
 		"knadh",
 		"koanf",
@@ -10,6 +16,7 @@
 		"OLAP",
 		"ONNX",
 		"rumdl",
+		"Ryer",
 		"speckit",
 		"stdlib"
 	]
