@@ -37,7 +37,7 @@ func TestHTTPPassthrough(t *testing.T) {
 		UpstreamTimeout: 5 * time.Second,
 		IdleTimeout:     5 * time.Second,
 		FlushInterval:   0,
-		Debug:           true,
+		Log:             proxy.LogConfig{Level: "debug"},
 	}
 
 	handler := proxy.NewServer(config)
@@ -77,7 +77,7 @@ func TestHTTPPassthrough(t *testing.T) {
 func TestHealthz(t *testing.T) {
 	config := &proxy.ProxyConfig{
 		ListenAddr: ":0",
-		Debug:      false,
+		Log:        proxy.LogConfig{Level: "error"},
 	}
 	handler := proxy.NewServer(config)
 	proxyServer := httptest.NewServer(handler)
@@ -111,7 +111,7 @@ func TestProxyHeaders(t *testing.T) {
 
 	config := &proxy.ProxyConfig{
 		ListenAddr: ":0",
-		Debug:      true,
+		Log:        proxy.LogConfig{Level: "debug"},
 	}
 	handler := proxy.NewServer(config)
 	proxyServer := httptest.NewServer(handler)

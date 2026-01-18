@@ -1,7 +1,7 @@
 package proxy
 
 import (
-	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 )
@@ -12,19 +12,15 @@ func ScopeMiddleware(next http.Handler, config *ProxyConfig) http.Handler {
 	// Detect scope once at initialization as per requirements.
 	cwd, err := os.Getwd()
 	if err != nil {
-		if config.Debug {
-			fmt.Printf("Error getting CWD for scope detection: %v\n", err)
-		}
+		slog.Error("Error getting CWD for scope detection", "err", err)
 		cwd = "."
 	}
 
 	scope, err := DetectScope(cwd)
 	if err != nil {
-		if config.Debug {
-			fmt.Printf("Error detecting scope: %v\n", err)
-		}
-	} else if config.Debug {
-		fmt.Printf("Initialized Scope: %s\n", scope)
+		slog.Debug("Error detecting scope", "err", err)
+	} else {
+		slog.Debug("Initialized Scope", "scope", scope)
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

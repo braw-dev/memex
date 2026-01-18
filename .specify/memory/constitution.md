@@ -112,6 +112,7 @@ These constraints are NON-NEGOTIABLE and MUST NOT be violated under any circumst
 | Embeddings | `all-MiniLM-L6-v2` (ONNX) via `//go:embed` |
 | Parsing | Tree-Sitter (Go bindings) |
 | Protocol | HTTP Proxy (Anthropic + OpenAI schemas) |
+| Testability | No `os.Setenv` in tests (inject `getenv`) |
 
 ## User Experience Laws
 
@@ -190,4 +191,4 @@ All new code MUST follow this structure. Deviations require explicit justificati
 - **MINOR**: New principles, sections, or materially expanded guidance
 - **PATCH**: Clarifications, wording improvements, typo fixes
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-17 | **Last Amended**: 2026-01-17
+**Version**: 1.0.1 | **Ratified**: 2026-01-17 | **Last Amended**: 2026-01-18

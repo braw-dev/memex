@@ -28,7 +28,6 @@ func NewServer(
     handler = someMiddleware(handler)
     return handler
 }
-
 ```
 
 ### 2. Centralized `routes.go`
@@ -46,7 +45,6 @@ func addRoutes(
     mux.Handle("GET /api/v1/users", handleUsersGet(logger, store))
     mux.Handle("POST /api/v1/users", handleUsersCreate(logger, store))
 }
-
 ```
 
 ## Handlers
@@ -70,7 +68,6 @@ func handleUsersGet(logger *Logger, store *DataStore) http.Handler {
         encode(w, r, http.StatusOK, data)
     })
 }
-
 ```
 
 ## Main & Execution
@@ -80,6 +77,7 @@ func handleUsersGet(logger *Logger, store *DataStore) http.Handler {
 * `func main()` should be minimal and only call a `run()` function.
 * `run` should accept OS fundamentals (`context`, `stdin`, `stdout`, `args`, `getenv`) to make the program easily testable.
 * `run` returns `error`. `main` handles the exit code.
+* **NEVER** use `os.Setenv` in tests. Pass a mock `getenv` function instead.
 
 ```go
 func run(
@@ -100,7 +98,6 @@ func main() {
         os.Exit(1)
     }
 }
-
 ```
 
 ## Data Handling
@@ -127,7 +124,6 @@ func decode[T any](r *http.Request) (T, error) {
     }
     return v, nil
 }
-
 ```
 
 ### 6. Validation Interface
@@ -141,7 +137,6 @@ type Validator interface {
     // len(problems) == 0 implies validity.
     Valid(ctx context.Context) (problems map[string]string)
 }
-
 ```
 
 ## Testing

@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -28,14 +30,14 @@ func run(
 	getenv func(string) string,
 ) error {
 	// Initialize config
-	loader := proxy.NewConfigLoader()
+	loader := proxy.NewConfigLoader(getenv)
 	config, err := loader.Load()
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	if config.Debug {
-		fmt.Fprintf(w, "Debug mode enabled\n")
+	if err := setupLogger(config.Log); err != nil {
+		return fmt.Errorf("failed to setup logger: %w", err)
 	}
 
 	// Create handler using NewServer (returns http.Handler)
@@ -53,7 +55,7 @@ func run(
 	// Start server in goroutine
 	errChan := make(chan error, 1)
 	go func() {
-		fmt.Fprintf(w, "Starting proxy server on %s\n", config.ListenAddr)
+		slog.Info("Starting proxy server", "addr", config.ListenAddr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			errChan <- err
 		}
@@ -81,5 +83,50 @@ func run(
 	}
 
 	fmt.Fprintf(w, "Server stopped\n")
+	return nil
+}
+
+func setupLogger(cfg proxy.LogConfig) error {
+	var level slog.Level
+	switch strings.ToLower(cfg.Level) {
+	case "debug":
+		level = slog.LevelDebug
+	case "info":
+		level = slog.LevelInfo
+	case "warn":
+		level = slog.LevelWarn
+	case "error":
+		level = slog.LevelError
+	default:
+		level = slog.LevelInfo
+	}
+
+	opts := &slog.HandlerOptions{
+		Level: level,
+	}
+
+	var w io.Writer = os.Stderr
+	if cfg.Path != "" && cfg.Path != "-" && cfg.Path != "stderr" {
+		if cfg.Path == "stdout" {
+			w = os.Stdout
+		} else {
+			f, err := os.OpenFile(cfg.Path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			if err != nil {
+				return err
+			}
+			w = f
+		}
+	}
+
+	var handler slog.Handler
+	if strings.ToLower(cfg.Format) == "json" {
+		handler = slog.NewJSONHandler(w, opts)
+	} else {
+		handler = slog.NewTextHandler(w, opts)
+	}
+
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
+
 	return nil
 }
