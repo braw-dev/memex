@@ -19,8 +19,9 @@ Take a GitHub issue number and optional context, validate the issue content, and
 ### Parse Input
 
 * Extract the **Issue Number** from `$ARGUMENTS` (look for formats like `#123` or just `123`).
+* If there is no issue number, check to see if the user is asking for "next unassigned" or similar.
 * Treat the rest of `$ARGUMENTS` as **Additional Context**.
-* If no issue number is found, **ERROR**: "Please provide a GitHub issue number (e.g., #123 or just 123) to proceed."
+* If no issue number is found or user has not asked for next unassigned issue or there are no unassigned issues, **ERROR**: "Please provide a GitHub issue number (e.g., #123 or just 123) to proceed or a valid issue to work on."
 
 ### Fetch Issue Details
 
