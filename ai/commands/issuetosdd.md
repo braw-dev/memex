@@ -55,6 +55,7 @@ Take a GitHub issue number and optional context, validate the issue content, and
 
 ### Orchestrate SDD Workflow
 
+* Assign the GitHub issue to me
 * Execute the following commands in sequence.
 * **Crucial**: Pass the full context (Issue Title + Body + User Context) to the first command (`/speckit.specify`).
 
