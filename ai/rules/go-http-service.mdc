@@ -1,3 +1,8 @@
+---
+description: Guidelines for writing maintainable, testable HTTP services in Go based on Mat Ryer's principles.
+globs: **/*.go
+---
+
 # Go HTTP Service Guidelines
 
 Follow these principles when writing HTTP services in Go to ensure maintainability, testability, and clarity. These rules are based on "How I write HTTP services in Go after 13 years" by Mat Ryer.
