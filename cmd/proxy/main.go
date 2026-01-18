@@ -30,7 +30,7 @@ func run(
 	getenv func(string) string,
 ) error {
 	// Initialize config
-	loader := proxy.NewConfigLoader()
+	loader := proxy.NewConfigLoader(getenv)
 	config, err := loader.Load()
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)

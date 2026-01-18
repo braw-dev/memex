@@ -1,18 +1,20 @@
 package proxy
 
 import (
-	"os"
 	"testing"
 )
 
 func TestDefaultConfigLoader_Load(t *testing.T) {
-	// Set environment variables for testing
-	os.Setenv("MEMEX_PROXY_LOG_LEVEL", "debug")
-	os.Setenv("MEMEX_PROXY_LOG_FORMAT", "json")
-	defer os.Unsetenv("MEMEX_PROXY_LOG_LEVEL")
-	defer os.Unsetenv("MEMEX_PROXY_LOG_FORMAT")
+	// Mock getenv
+	env := map[string]string{
+		"MEMEX_PROXY_LOG_LEVEL":  "debug",
+		"MEMEX_PROXY_LOG_FORMAT": "json",
+	}
+	getenv := func(key string) string {
+		return env[key]
+	}
 
-	loader := NewConfigLoader()
+	loader := NewConfigLoader(getenv)
 	config, err := loader.Load()
 	if err != nil {
 		t.Fatalf("Load() error = %v", err)
@@ -27,12 +29,10 @@ func TestDefaultConfigLoader_Load(t *testing.T) {
 }
 
 func TestDefaults(t *testing.T) {
-	// Ensure clean env (only relevant keys)
-	os.Unsetenv("MEMEX_PROXY_LOG_LEVEL")
-	os.Unsetenv("MEMEX_PROXY_LOG_FORMAT")
-	os.Unsetenv("MEMEX_PROXY_LOG_PATH")
+	// Empty getenv
+	getenv := func(key string) string { return "" }
 
-	loader := NewConfigLoader()
+	loader := NewConfigLoader(getenv)
 	config, err := loader.Load()
 	if err != nil {
 		t.Fatalf("Load() error = %v", err)

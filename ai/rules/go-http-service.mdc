@@ -1,8 +1,3 @@
----
-description: Guidelines for writing maintainable, testable HTTP services in Go based on Mat Ryer's principles.
-globs: **/*.go
----
-
 # Go HTTP Service Guidelines
 
 Follow these principles when writing HTTP services in Go to ensure maintainability, testability, and clarity. These rules are based on "How I write HTTP services in Go after 13 years" by Mat Ryer.
@@ -28,7 +23,6 @@ func NewServer(
     handler = someMiddleware(handler)
     return handler
 }
-
 ```
 
 ### 2. Centralized `routes.go`
@@ -46,7 +40,6 @@ func addRoutes(
     mux.Handle("GET /api/v1/users", handleUsersGet(logger, store))
     mux.Handle("POST /api/v1/users", handleUsersCreate(logger, store))
 }
-
 ```
 
 ## Handlers
@@ -70,7 +63,6 @@ func handleUsersGet(logger *Logger, store *DataStore) http.Handler {
         encode(w, r, http.StatusOK, data)
     })
 }
-
 ```
 
 ## Main & Execution
@@ -80,6 +72,7 @@ func handleUsersGet(logger *Logger, store *DataStore) http.Handler {
 * `func main()` should be minimal and only call a `run()` function.
 * `run` should accept OS fundamentals (`context`, `stdin`, `stdout`, `args`, `getenv`) to make the program easily testable.
 * `run` returns `error`. `main` handles the exit code.
+* **NEVER** use `os.Setenv` in tests. Pass a mock `getenv` function instead.
 
 ```go
 func run(
@@ -100,7 +93,6 @@ func main() {
         os.Exit(1)
     }
 }
-
 ```
 
 ## Data Handling
@@ -127,7 +119,6 @@ func decode[T any](r *http.Request) (T, error) {
     }
     return v, nil
 }
-
 ```
 
 ### 6. Validation Interface
@@ -141,7 +132,6 @@ type Validator interface {
     // len(problems) == 0 implies validity.
     Valid(ctx context.Context) (problems map[string]string)
 }
-
 ```
 
 ## Testing
