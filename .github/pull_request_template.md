@@ -12,3 +12,7 @@
 
 - [ ] Tested locally
 - [ ] Linked to issue/task (if applicable)
+
+## Resolution
+
+[closes/resolves/fixes]: [ISSUE #]
