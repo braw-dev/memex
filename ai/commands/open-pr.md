@@ -35,7 +35,8 @@ Open a Pull Request for the current branch using the repository's PR template (`
 
 4. **Execute PR Creation**:
    * Push the current branch to the remote (`git push -u origin HEAD`).
-   * Create the PR using the `user-github` MCP server (`create_pull_request`).
+   * Create the PR in **draft mode** using the `user-github` MCP server (`create_pull_request`).
+   * **Fallback**: If the MCP tool fails, use the `gh` command line tool (`gh pr create --draft`).
 
 5. **Completion**:
    * Report the PR URL to the user.
@@ -84,4 +85,14 @@ Open a Pull Request for the current branch using the repository's PR template (`
    * `body`: [filled template]
    * `head`: [current branch]
    * `base`: "main"
-3. Capture the output URL and display it prominently.
+   * `draft`: true
+3. **Fallback**: If `create_pull_request` fails, use the `gh` CLI:
+
+   ```bash
+   gh pr create --draft --title "[title]" --body "$(cat <<'EOF'
+   [body content here]
+   EOF
+   )" --head [head] --base main
+   ```
+
+4. Capture the output URL and display it prominently.
