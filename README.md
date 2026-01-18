@@ -27,6 +27,10 @@ If the hot command is the only text in the message Memex will reply with an ackn
 | `!memex:skip` | Bypass the Memex cache |
 | `!memex:bust` | Clear/bust the Memex cache. This will remove all cache entries, essentially starting from scratch. If there is other content in the message this will be forwarded on as normal. |
 
+## Get Started
+
+*todo(kisamoto):* Write the getting started docs.
+
 ## Frequently Asked Questions (FAQ)
 
 ### How does this differ from caching built in to the LLM providers?
@@ -44,4 +48,6 @@ An example using a shared Memex as part of a team editing a codebase:
 
 An example using Memex locally:
 
-- You
+- You ask Claude how the payments functionality works in your project.
+- Memex caches the response from the upstream LLM.
+- Future requests in separate Claude agents or tools such as Codex or Cursor about how payments work will be returned via Memex, saving time and tokens.
