@@ -24,7 +24,7 @@ func BenchmarkProxyPassthrough(b *testing.B) {
 		UpstreamTimeout: 5 * time.Second,
 		IdleTimeout:     5 * time.Second,
 		FlushInterval:   0,
-		Debug:           false, // Disable logging for benchmark
+		Log:             proxy.LogConfig{Level: "error"}, // Minimal logging
 	}
 	handler := proxy.NewServer(config)
 	proxyServer := httptest.NewServer(handler)

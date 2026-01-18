@@ -4,13 +4,22 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/knadh/koanf/parsers/toml/v2"
 	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/fs"
 	"github.com/knadh/koanf/v2"
 )
+
+// LogConfig represents the logging configuration
+type LogConfig struct {
+	Level  string `koanf:"level"`
+	Format string `koanf:"format"`
+	Path   string `koanf:"path"`
+}
 
 // ProxyConfig represents the proxy server configuration
 type ProxyConfig struct {
@@ -18,7 +27,7 @@ type ProxyConfig struct {
 	UpstreamTimeout time.Duration `koanf:"upstream_timeout"`
 	IdleTimeout     time.Duration `koanf:"idle_timeout"`
 	FlushInterval   time.Duration `koanf:"flush_interval"`
-	Debug           bool          `koanf:"debug"`
+	Log             LogConfig     `koanf:"log"`
 }
 
 // ConfigLoader loads configuration from various sources
@@ -40,11 +49,17 @@ func (l *DefaultConfigLoader) Load() (*ProxyConfig, error) {
 
 	// Default values
 	defaults := map[string]interface{}{
-		"proxy.listen":           ":8080",
-		"proxy.upstream_timeout": "60s",
-		"proxy.idle_timeout":     "90s",
-		"proxy.flush_interval":   "0s",
-		"proxy.debug":            false,
+		"proxy": map[string]interface{}{
+			"listen":           ":8080",
+			"upstream_timeout": "60s",
+			"idle_timeout":     "90s",
+			"flush_interval":   "0s",
+			"log": map[string]interface{}{
+				"level":  "info",
+				"format": "text",
+				"path":   "stderr",
+			},
+		},
 	}
 	if err := k.Load(mapProvider(defaults), nil); err != nil {
 		return nil, fmt.Errorf("failed to load defaults: %w", err)
@@ -75,6 +90,13 @@ func (l *DefaultConfigLoader) Load() (*ProxyConfig, error) {
 			}
 			break
 		}
+	}
+
+	// Load environment variables
+	if err := k.Load(env.Provider("MEMEX_", ".", func(s string) string {
+		return strings.Replace(strings.ToLower(strings.TrimPrefix(s, "MEMEX_")), "_", ".", -1)
+	}), nil); err != nil {
+		return nil, fmt.Errorf("failed to load env vars: %w", err)
 	}
 
 	// Unmarshal into struct

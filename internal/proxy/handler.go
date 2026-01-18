@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -47,7 +47,7 @@ func NewServer(config *ProxyConfig) http.Handler {
 		Director:      makeDirector(detector, config),
 		Transport:     transport,
 		FlushInterval: config.FlushInterval, // 0 for immediate flushing (SSE)
-		ErrorLog:      nil,                  // TODO: Use proper logger
+		ErrorLog:      slog.NewLogLogger(slog.Default().Handler(), slog.LevelError),
 		ErrorHandler:  makeErrorHandler(config),
 	}
 
@@ -62,11 +62,9 @@ func NewServer(config *ProxyConfig) http.Handler {
 	mux.HandleFunc("GET /healthz", handleHealthz())
 	mux.HandleFunc("/", handler.handleProxy)
 
-	// Apply middleware if needed
+	// Apply middleware
 	var h http.Handler = mux
-	if config.Debug {
-		h = debugMiddleware(h, config)
-	}
+	h = debugMiddleware(h, config)
 
 	// ScopeMiddleware (Principle V: Auth/Scope is first)
 	h = ScopeMiddleware(h, config)
@@ -97,10 +95,8 @@ func (h *proxyHandler) handleProxy(w http.ResponseWriter, r *http.Request) {
 	// Forward request
 	h.proxy.ServeHTTP(w, r.WithContext(ctx))
 
-	if h.config.Debug {
-		duration := time.Since(startTime)
-		fmt.Printf("Completed %s %s in %v [Schema: %s]\n", r.Method, r.URL.Path, duration, schema)
-	}
+	duration := time.Since(startTime)
+	slog.Debug("Completed request", "method", r.Method, "path", r.URL.Path, "duration", duration, "schema", schema)
 }
 
 // makeDirector creates a director function for ReverseProxy
@@ -125,9 +121,7 @@ func makeDirector(detector *SchemaDetector, config *ProxyConfig) func(*http.Requ
 func makeErrorHandler(config *ProxyConfig) func(http.ResponseWriter, *http.Request, error) {
 	return func(w http.ResponseWriter, r *http.Request, err error) {
 		if err != nil {
-			if config.Debug {
-				fmt.Printf("Proxy error: %v\n", err)
-			}
+			slog.Error("Proxy error", "err", err, "path", r.URL.Path)
 			w.WriteHeader(http.StatusBadGateway)
 			// Minimal error response
 			w.Write([]byte("Bad Gateway"))
@@ -138,9 +132,7 @@ func makeErrorHandler(config *ProxyConfig) func(http.ResponseWriter, *http.Reque
 // debugMiddleware adds debug logging to requests
 func debugMiddleware(next http.Handler, config *ProxyConfig) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if config.Debug {
-			fmt.Printf("Request: %s %s\n", r.Method, r.URL.Path)
-		}
+		slog.Debug("Request started", "method", r.Method, "path", r.URL.Path)
 		next.ServeHTTP(w, r)
 	})
 }
